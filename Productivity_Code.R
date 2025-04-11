@@ -27,7 +27,21 @@ initial_lm <- glm(Productivity_Binary_Score ~ Age + Gender + Total.Sleep.Hours +
 summary(initial_lm)
 
 
-#simplified_model
+#running step function to further confirm significant variables
+
+full_model <- glm(Productivity_Binary_Score ~ Age + Gender + Total.Sleep.Hours + Exercise..mins.day. 
+                  + Caffeine.Intake..mg. + Screen.Time.Before.Bed..mins. + Work.Hours..hrs.day.+ Sleep.Quality, 
+                  family = binomial, 
+                  data = cleaned_data)
+
+step_model <- step(full_model, direction = "backward")
+
+summary(step_model)
+
+
+
+
+#refined model
 
 refined_model <- glm(Productivity_Binary_Score ~ Total.Sleep.Hours, 
                      family = binomial, 
