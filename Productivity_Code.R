@@ -1,5 +1,6 @@
 
 library(dplyr)
+library(randomForest)
 
 #Loading and Cleaning data
 
@@ -12,11 +13,12 @@ cleaned_data <- sleep_cycle_productivity %>%
     
     # Create a binary variable to do Logistic Regression.
     Productivity_Binary_Score = factor(
-      ifelse(Productivity.Score >= 6, "High", "Low"), 
-      levels = c("Low", "High")
-    ),
+      ifelse(Productivity.Score >= 6, "High", "Low"), levels = c("Low", "High")
+    )
     
   )
+
+table(cleaned_data$Productivity_Binary_Score)
 
 
 # Run logistic regression
@@ -49,7 +51,7 @@ refined_model <- glm(Productivity_Binary_Score ~ Total.Sleep.Hours,
 summary(refined_model)
 
 
-#Finding MSE for the Refined Model
+#Finding MSE for the Refined Logistic Model
 
 mse = rep(0,10)
 for (i in 1:10){
@@ -72,6 +74,37 @@ for (i in 1:10){
 
 mean_mse = mean(mse)
 print(mean_mse)
+
+
+
+#Random Forests
+
+
+#Initial model
+set.seed(42)
+
+initial_rf = randomForest(Productivity.Score ~ Age + Gender + Total.Sleep.Hours + Exercise..mins.day. 
+                          + Caffeine.Intake..mg. + Screen.Time.Before.Bed..mins. + Work.Hours..hrs.day.+ Sleep.Quality, 
+                          mtry = sqrt(8),
+                          importance = TRUE,
+                          data = cleaned_data)
+
+initial_rf
+
+varImpPlot(initial_rf, sort = TRUE, main = NA)
+
+
+#Refined Model
+
+refined_rf = randomForest(Productivity.Score ~  Total.Sleep.Hours + Exercise..mins.day. 
+                          + Caffeine.Intake..mg., 
+                          mtry = sqrt(8),
+                          importance = TRUE,
+                          data = cleaned_data)
+
+refined_rf
+
+varImpPlot(refined_rf, sort = TRUE, main = NA)
 
 
 
